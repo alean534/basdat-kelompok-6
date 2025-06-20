@@ -315,40 +315,46 @@ public class AdminMenu {
         SELECT
             r.id_reservasi,
             p.nama AS nama_pelanggan,
-            p.telepon AS no_telp, 
-            r.created_at AS tanggal_reservasi_dibuat,
+            p.telepon AS no_telp,
             r.status_reservasi,
-            m.nomor_meja,
+            GROUP_CONCAT(m.nomor_meja ORDER BY m.nomor_meja SEPARATOR ', ') AS nomor_meja,
             bayar.total_tagihan,
             bayar.metode,
-            bayar.tanggal_bayar AS waktu_kedatangan
+            TIMESTAMP(jr.tanggal, jr.jam_mulai) AS waktu_kedatangan
         FROM reservasi r
         JOIN pelanggan p ON r.id_pelanggan = p.id_pelanggan
         JOIN reservasi_meja rm ON r.id_reservasi = rm.id_reservasi
         JOIN meja m ON rm.id_meja = m.id_meja
+        JOIN jadwal_reservasi jr  ON r.id_jadwal = jr.id_jadwal
         LEFT JOIN pembayaran bayar ON r.id_reservasi = bayar.id_reservasi
-        ORDER BY r.created_at DESC;
+        GROUP BY r.id_reservasi, p.nama, p.telepon, r.status_reservasi, bayar.total_tagihan, bayar.metode, jr.tanggal
+        ORDER BY r.id_reservasi ASC;
         """;
 
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             System.out.println("\n-------------------------------------------------------------------------------------------------------------------------");
             System.out.println("                                 DAFTAR RESERVASI");
             System.out.println("------------------------------------------------------------------------------------------------------------------------");
-            System.out.printf("%-5s %-20s %-13s %-20s %-12s %-8s %-12s %-10s %-20s\n",
-                    "ID", "Nama Pelanggan", "No. Telp", "Tgl Dibuat", "Status", "Meja", "Total", "Metode", "Kedatangan");
+            System.out.printf("%-4s %-18s %-16s %-9s %-20s %-11s %-10s %-20s\n",
+                    "ID", "Nama Pelanggan", "No. Telp", "Status", "Meja", "Total", "Metode", "Kedatangan");
+
+            System.out.println("---------------------------------------------------------------------------------------------------------------");
 
             while (rs.next()) {
-                System.out.printf("%-5d %-20s %-13s %-20s %-12s %-8s Rp%-10.0f %-10s %-20s\n",
+                Timestamp ts = rs.getTimestamp("waktu_kedatangan");
+                String waktuKedatangan = ts.toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+
+                System.out.printf("%-4d %-18s %-16s %-9s %-20s Rp%-10.0f %-10s %-20s\n",
                         rs.getInt("id_reservasi"),
                         rs.getString("nama_pelanggan"),
                         rs.getString("no_telp"),
-                        rs.getTimestamp("tanggal_reservasi_dibuat"),
                         rs.getString("status_reservasi"),
                         rs.getString("nomor_meja"),
                         rs.getDouble("total_tagihan"),
                         rs.getString("metode"),
-                        rs.getTimestamp("waktu_kedatangan"));
+                        waktuKedatangan);
             }
+
         } catch (SQLException e) {
             System.out.println("Gagal menampilkan reservasi: " + e.getMessage());
         }

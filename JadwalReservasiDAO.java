@@ -1,6 +1,8 @@
 package reservasi_foosen;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,4 +64,34 @@ public class JadwalReservasiDAO {
         }
         return null;
     }
+    
+    
+    public LocalDate getTanggalById(int idJadwal) {
+    String sql = "SELECT tanggal FROM jadwal_reservasi WHERE id_jadwal = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, idJadwal);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getDate("tanggal").toLocalDate();
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return LocalDate.now(); // fallback
+}
+
+public LocalTime getJamSelesaiById(int idJadwal) {
+    String sql = "SELECT jam_selesai FROM jadwal_reservasi WHERE id_jadwal = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, idJadwal);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getTime("jam_selesai").toLocalTime();
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return LocalTime.now(); // fallback
+}
+
 }

@@ -27,6 +27,28 @@ public class ReservasiMejaDAO {
             e.printStackTrace();
         }
     }
+    
+    public int getTotalKapasitasMejaByReservasiId(int idReservasi) {
+    int total = 0;
+    String sql = """
+        SELECT SUM(m.kapasitas) AS total
+        FROM reservasi_meja rm
+        JOIN meja m ON rm.id_meja = m.id_meja
+        WHERE rm.id_reservasi = ?
+    """;
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, idReservasi);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                total = rs.getInt("total");
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return total;
+}
+
 
     public List<ReservasiMeja> getReservasiMejaByReservasiId(int idReservasi) {
         List<ReservasiMeja> list = new ArrayList<>();

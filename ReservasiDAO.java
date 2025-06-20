@@ -49,11 +49,11 @@ public class ReservasiDAO {
     }
 
     public Reservasi getByMeja(int idMeja) {
-        String sql = "SELECT r.*, j.tanggal, j.jam_mulai " +
-                     "FROM reservasi r " +
-                     "JOIN reservasi_meja rm ON r.id_reservasi = rm.id_reservasi " +
-                     "JOIN jadwal_reservasi j ON r.id_jadwal = j.id_jadwal " +
-                     "WHERE rm.id_meja = ? ORDER BY r.id_reservasi DESC LIMIT 1";
+        String sql = "SELECT r.*, j.tanggal, j.jam_mulai "
+                + "FROM reservasi r "
+                + "JOIN reservasi_meja rm ON r.id_reservasi = rm.id_reservasi "
+                + "JOIN jadwal_reservasi j ON r.id_jadwal = j.id_jadwal "
+                + "WHERE rm.id_meja = ? ORDER BY r.id_reservasi DESC LIMIT 1";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idMeja);
@@ -63,7 +63,6 @@ public class ReservasiDAO {
                         rs.getInt("id_reservasi"),
                         rs.getInt("id_pelanggan"),
                         rs.getInt("id_jadwal"),
-                        LocalDateTime.of(rs.getDate("tanggal").toLocalDate(), rs.getTime("jam_mulai").toLocalTime()),
                         rs.getString("status_reservasi"),
                         rs.getString("catatan_reservasi")
                 );
@@ -74,20 +73,16 @@ public class ReservasiDAO {
         return null;
     }
 
-    public Reservasi getById(int id) {
-        String sql = "SELECT r.*, j.tanggal, j.jam_mulai " +
-                     "FROM reservasi r " +
-                     "JOIN jadwal_reservasi j ON r.id_jadwal = j.id_jadwal " +
-                     "WHERE id_reservasi = ?";
+    public Reservasi getById(int idReservasi) {
+        String sql = "SELECT * FROM reservasi WHERE id_reservasi = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
+            stmt.setInt(1, idReservasi);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return new Reservasi(
                         rs.getInt("id_reservasi"),
                         rs.getInt("id_pelanggan"),
                         rs.getInt("id_jadwal"),
-                        LocalDateTime.of(rs.getDate("tanggal").toLocalDate(), rs.getTime("jam_mulai").toLocalTime()),
                         rs.getString("status_reservasi"),
                         rs.getString("catatan_reservasi")
                 );
@@ -100,10 +95,10 @@ public class ReservasiDAO {
 
     public List<Reservasi> getAllReservasi() {
         List<Reservasi> list = new ArrayList<>();
-        String sql = "SELECT r.id_reservasi, r.id_pelanggan, r.id_jadwal, r.catatan_reservasi, r.status_reservasi, " +
-                     "j.tanggal, j.jam_mulai " +
-                     "FROM reservasi r " +
-                     "JOIN jadwal_reservasi j ON r.id_jadwal = j.id_jadwal";
+        String sql = "SELECT r.id_reservasi, r.id_pelanggan, r.id_jadwal, r.catatan_reservasi, r.status_reservasi, "
+                + "j.tanggal, j.jam_mulai "
+                + "FROM reservasi r "
+                + "JOIN jadwal_reservasi j ON r.id_jadwal = j.id_jadwal";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             ResultSet rs = stmt.executeQuery();
@@ -112,7 +107,6 @@ public class ReservasiDAO {
                         rs.getInt("id_reservasi"),
                         rs.getInt("id_pelanggan"),
                         rs.getInt("id_jadwal"),
-                        LocalDateTime.of(rs.getDate("tanggal").toLocalDate(), rs.getTime("jam_mulai").toLocalTime()),
                         rs.getString("status_reservasi"),
                         rs.getString("catatan_reservasi")
                 ));
