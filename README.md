@@ -1,18 +1,17 @@
-# 🏕️ <!-- PROYEK SISTEM MANAJEMEN RESERVASI MEJA RESTORAN -->
+# 🏕️ PROYEK SISTEM MANAJEMEN RESERVASI MEJA RESTORAN 
 Program ini dirancang untuk membantu proses reservasi restoran. Mulai dari kelola keryawan, meja restoran, hingga reservasi.
 
 ---
 
 ## 🔑 Fitur Utama
+AUTENTIKASI 
+  Fungsi ini berguna untuk memberikan akses sesuai dengan rolenya 
 
-- **<! AUTENTIKASI >**  
-  <! Fungsi ini berguna untuk memberikan akses sesuai dengan rolenya >
+ROLE ADMIN
+  Tambah Menu, Hapus Menu, Edit Menu, Lihat Daftar Menu 
 
-- **<! ROLE ADMIN >**  
-  <! Tambah Menu, Hapus Menu, Edit Menu, Lihat Daftar Menu >
-
-- **<! ROLE KASIR >**  
-  <! Buat Reservasi, Konfirmasi Kedatangan, Input Order Menu, Pembayaran, Lihat Menu Tersedia >
+ROLE KASIR
+  Buat Reservasi, Konfirmasi Kedatangan, Input Order Menu, Pembayaran, Lihat Menu Tersedia 
 
 ---
 
