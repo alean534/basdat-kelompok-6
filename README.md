@@ -15,12 +15,12 @@ ROLE KASIR
 
 ---
 
-## 🧑‍🤝‍🧑 Biodata Kelompok <!-- GANTI: Nomor Kelompok -->
+## 🧑‍🤝‍🧑 Biodata Kelompok 
 
 | Nama Lengkap            | NPM           |
-|-------------------------|---------------|
-| <!-- Devi Vara Pramudyta -->     | <!-- 24082010093 -->   |
-| <!-- Nindy Viviva Asri -->     | <!-- 24082010096 -->   |
-| <!-- Novita Fitriani -->     | <!-- 24082010124 -->   |
-| <!-- Rika Wati -->     | <!-- 24082010131 -->   |
+|-------------------------|-------------------------|
+|  Devi Vara Pramudyta    |  24082010093 |
+|  Nindy Viviva Asri      |  24082010096 |
+|  Novita Fitriani        |  24082010124 |
+|  Rika Wati              |  24082010131 |
 
