@@ -4,13 +4,13 @@ Program ini dirancang untuk membantu proses reservasi restoran. Mulai dari kelol
 ---
 
 ## 🔑 Fitur Utama
-AUTENTIKASI 
+AUTENTIKASI: 
   Fungsi ini berguna untuk memberikan akses sesuai dengan rolenya 
 
-ROLE ADMIN
+ROLE ADMIN:
   Tambah Menu, Hapus Menu, Edit Menu, Lihat Daftar Menu 
 
-ROLE KASIR
+ROLE KASIR:
   Buat Reservasi, Konfirmasi Kedatangan, Input Order Menu, Pembayaran, Lihat Menu Tersedia 
 
 ---
