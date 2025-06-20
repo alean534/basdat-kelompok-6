@@ -4,7 +4,6 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class ViewMejaTersedia {
-
     private final Connection conn;
 
     public ViewMejaTersedia(Connection conn) {
@@ -13,9 +12,6 @@ public class ViewMejaTersedia {
 
     public void tampilkanMejaTersedia(Scanner scanner) {
         try {
-            System.out.println("\n---------------------------------------------------------------");
-            System.out.println("                CEK KETERSEDIAAN");
-            System.out.println("\n---------------------------------------------------------------");
             System.out.print("Tanggal (yyyy-mm-dd): ");
             String tanggalStr = scanner.nextLine();
             System.out.print("Jam Mulai (HH:mm): ");
@@ -46,11 +42,8 @@ public class ViewMejaTersedia {
 
                 ResultSet rs = stmt.executeQuery();
 
-                System.out.println("\n---------------------------------------------------------------");
-                System.out.println("                         DAFTAR MEJA TERSEDIA");
-                System.out.println("----------------------------------------------------------------");
+                System.out.println("\n=== Daftar Meja Tersedia ===");
                 System.out.printf("%-6s %-10s %-10s %-10s\n", "ID", "Nomor", "Kapasitas", "Area");
-                System.out.println("----------------------------------------------------------------");
 
                 boolean found = false;
                 while (rs.next()) {

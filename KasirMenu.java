@@ -14,7 +14,6 @@ public class KasirMenu {
     private static ReservasiDAO reservasiDAO;
     private static OrderMakananDAO orderDAO;
     private static PembayaranDAO pembayaranDAO;
-    private static StackOrder stackOrder = new StackOrder();
 
     public static void showKasirMenu(Scanner scanner, Connection conn) throws SQLException {
         menuDAO = new MenuDAO(conn);
@@ -24,19 +23,16 @@ public class KasirMenu {
         pembayaranDAO = new PembayaranDAO(conn);
 
         while (true) {
-            System.out.println("\n===============================================");
-            System.out.println("                MENU KASIR");
-            System.out.println("===============================================");
-            System.out.println("1. BUAT RESERVASI");
-            System.out.println("2. KONFIRMASI KEDATANGAN");
-            System.out.println("3. INPUT ORDER MENU");
-            System.out.println("4. PEMBAYARAN");
-            System.out.println("5. LIHAT MEJA TERSEDIA");
-            System.out.println("6. KELUAR");
-            System.out.println("-----------------------------------------------");
-            System.out.print("PILIH MENU : ");
-            String input = scanner.nextLine();
+            System.out.println("\n===== MENU KASIR =====");
+            System.out.println("1. Buat Reservasi");
+            System.out.println("2. Konfirmasi Kedatangan");
+            System.out.println("3. Input Order Menu");
+            System.out.println("4. Pembayaran");
+            System.out.println("5. Lihat Meja Tersedia");
+            System.out.println("6. Keluar");
+            System.out.print("Pilih Menu: ");
 
+            String input = scanner.nextLine();
             switch (input) {
                 case "1" ->
                     buatReservasi(scanner, conn);
@@ -65,9 +61,6 @@ public class KasirMenu {
         JadwalReservasiDAO jadwalDAO = new JadwalReservasiDAO(conn);
         ReservasiMejaDAO reservasiMejaDAO = new ReservasiMejaDAO(conn);
 
-        System.out.println("\n-----------------------------------------------");
-        System.out.println("                BUAT RESERVASI");
-        System.out.println("-----------------------------------------------");
         System.out.print("Nama Pelanggan: ");
         String nama = scanner.nextLine();
         System.out.print("No Telepon    : ");
@@ -105,7 +98,6 @@ public class KasirMenu {
             return;
         }
 
-        System.out.println("\n-----------------------------------------------");
         System.out.println("\n--- Meja Akan Digunakan ---");
         for (Meja meja : mejaTersedia) {
             System.out.printf("ID: %d | No: %s | Kapasitas: %d | Area: %s\n",
@@ -122,7 +114,6 @@ public class KasirMenu {
             reservasiMejaDAO.tambahReservasiMeja(new ReservasiMeja(idReservasi, meja.getIdMeja()));
         }
 
-        System.out.println("\n-----------------------------------------------");
         System.out.println("Reservasi berhasil. ID Reservasi: " + idReservasi);
 
         if (status.equalsIgnoreCase("dipesan")) {
@@ -164,9 +155,6 @@ public class KasirMenu {
     }
 
     private static void konfirmasiKedatangan(Scanner scanner, Connection conn) {
-        System.out.println("\n-----------------------------------------------------");
-        System.out.println("             KONFIRMASI KEDATANGAN");
-        System.out.println("------------------------------------------------------");
         System.out.print("Masukkan Tanggal Reservasi (yyyy-mm-dd): ");
         String tanggalStr = scanner.nextLine();
 
@@ -198,11 +186,8 @@ public class KasirMenu {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setDate(1, tanggalSql);
             try (ResultSet rs = stmt.executeQuery()) {
-                System.out.println("\n--------------------------------------------------------------------------");
-                System.out.println("     === Daftar Reservasi Terjadwal ===");
-                System.out.println("----------------------------------------------------------------------------");
+                System.out.println("\n=== Daftar Reservasi Terjadwal ===");
                 System.out.printf("%-5s %-20s %-12s %-10s %-12s\n", "ID", "Nama", "Tanggal", "Jam", "Status");
-                System.out.println("---------------------------------------------------------------------------");
 
                 while (rs.next()) {
                     int idReservasi = rs.getInt("id_reservasi");
@@ -254,7 +239,7 @@ public class KasirMenu {
         if (sukses) {
             // Jika dibatalkan, kembalikan semua meja jadi tersedia
             if (statusBaru.equals("batal")) {
-                System.out.println("Reservasi dibatalkan.");
+                System.out.println("Reservasi dibatalkan. (Meja otomatis dikembalikan oleh trigger database)");
             } else {
                 System.out.println("Status reservasi berhasil diubah menjadi '" + statusBaru + "'.");
             }
@@ -265,9 +250,6 @@ public class KasirMenu {
     }
 
     private static void inputOrderMenu(Scanner scanner) {
-        System.out.println("\n-----------------------------------------------");
-        System.out.println("                INPUT ORDER MENU");
-        System.out.println("-----------------------------------------------");
         System.out.print("Masukkan ID Reservasi: ");
         int idReservasi = Integer.parseInt(scanner.nextLine());
         inputOrderMenu(scanner, idReservasi);
@@ -277,13 +259,12 @@ public class KasirMenu {
         Map<Menu, Integer> pesanan = new LinkedHashMap<>();
 
         while (true) {
-            System.out.print("Kategori (Makanan/Minuman/Camilan/Undo/Completed): ");
+            System.out.print("Kategori (Makanan/Minuman/Camilan/Completed): ");
             String kategori = scanner.nextLine();
-            System.out.println("-----------------------------------------------");
 
             if (kategori.equalsIgnoreCase("Completed")) {
                 if (pesanan.isEmpty()) {
-                    System.out.println("Tidak ada pesanan.");
+                    System.out.println("Tidak ada pesanan yang dimasukkan.");
                     return;
                 }
 
@@ -291,43 +272,6 @@ public class KasirMenu {
                 orderDAO.updateTotalTagihan(idReservasi);
                 System.out.println("Pesanan berhasil disimpan.");
                 return;
-            }
-
-            if (kategori.equalsIgnoreCase("Undo")) {
-                OrderMakanan dibatalkan = stackOrder.pop();
-                if (dibatalkan != null) {
-                    Menu m = dibatalkan.getMenu();
-                    int jumlah = dibatalkan.getJumlah();
-                    pesanan.put(m, pesanan.getOrDefault(m, 0) - jumlah);
-                    if (pesanan.get(m) <= 0) {
-                        pesanan.remove(m);
-                    }
-                    System.out.println("Undo berhasil: " + m.getNama() + " x" + jumlah);
-                    System.out.println("-----------------------------------------------\n");
-                    if (pesanan.isEmpty()) {
-                        System.out.println("Pesanan sekarang kosong.");
-                    } else {
-                        System.out.println("Pesanan saat ini:");
-                        System.out.println("-----------------------------------------------\n");
-                        System.out.printf("%-20s %-10s %-10s\n", "Menu", "Jumlah", "Subtotal");
-                        System.out.println("-------------------------------------------");
-                        for (Map.Entry<Menu, Integer> entry : pesanan.entrySet()) {
-                            Menu menu = entry.getKey();
-                            int jml = entry.getValue();
-                            double subtotal = menu.getHarga() * jml;
-                            System.out.printf("%-20s %-10d Rp%-10.0f\n", menu.getNama(), jml, subtotal);
-                        }
-                        System.out.println("-------------------------------------------");
-                        double totalSementara = pesanan.entrySet().stream()
-                                .mapToDouble(e -> e.getKey().getHarga() * e.getValue())
-                                .sum();
-                        System.out.printf("TOTAL SEMENTARA : Rp %.0f\n", totalSementara);
-                        System.out.println("-----------------------------------------------");
-                    }
-                } else {
-                    System.out.println("Tidak ada pesanan untuk di-undo.");
-                }
-                continue;
             }
 
             List<Menu> daftar = menuDAO.getMenuByKategori(kategori);
@@ -340,48 +284,21 @@ public class KasirMenu {
                 System.out.printf("%d - %s (Rp %.0f)\n", m.getIdMenu(), m.getNama(), m.getHarga());
             }
 
-            System.out.println("-----------------------------------------------");
             System.out.print("Pilih ID Menu: ");
             int idMenu = Integer.parseInt(scanner.nextLine());
             System.out.print("Jumlah: ");
             int jumlah = Integer.parseInt(scanner.nextLine());
-            System.out.println("-----------------------------------------------");
 
             Menu selected = daftar.stream().filter(m -> m.getIdMenu() == idMenu).findFirst().orElse(null);
             if (selected != null) {
                 pesanan.put(selected, pesanan.getOrDefault(selected, 0) + jumlah);
-                OrderMakanan o = new OrderMakanan(idReservasi, selected.getIdMenu(), jumlah, "");
-                o.setMenu(selected);
-                stackOrder.push(o);  // simpan ke stack untuk bisa di-undo
-
-                // 🖨️ Cetak ringkasan pesanan saat ini
-                System.out.println("Pesanan saat ini:");
-                System.out.println("-----------------------------------------------\n");
-                System.out.printf("%-20s %-10s %-10s\n", "Menu", "Jumlah", "Subtotal");
-                System.out.println("-------------------------------------------");
-                for (Map.Entry<Menu, Integer> entry : pesanan.entrySet()) {
-                    Menu m = entry.getKey();
-                    int jml = entry.getValue();
-                    double subtotal = m.getHarga() * jml;
-                    System.out.printf("%-20s %-10d Rp%-10.0f\n", m.getNama(), jml, subtotal);
-                }
-                System.out.println("-------------------------------------------");
-                double totalSementara = pesanan.entrySet().stream()
-                        .mapToDouble(e -> e.getKey().getHarga() * e.getValue())
-                        .sum();
-                System.out.printf("TOTAL SEMENTARA : Rp %.0f\n", totalSementara);
-                System.out.println("-----------------------------------------------");
             } else {
                 System.out.println("ID menu tidak ditemukan.");
             }
         }
-
     }
 
     private static void pembayaran(Scanner scanner) {
-        System.out.println("\n-----------------------------------------------");
-        System.out.println("                PEMBAYARAN");
-        System.out.println("-----------------------------------------------");
         System.out.print("Masukkan ID Reservasi: ");
         int idReservasi = Integer.parseInt(scanner.nextLine());
 
@@ -390,21 +307,6 @@ public class KasirMenu {
             System.out.println("Reservasi tidak ditemukan.");
             return;
         }
-        // Tampilkan informasi dasar reservasi
-        Pelanggan pelanggan = new PelangganDAO(DBConnection.getConnection()).getById(r.getIdPelanggan());
-        JadwalReservasiDAO jadwalDAO = new JadwalReservasiDAO(DBConnection.getConnection());
-        LocalDate tanggalReservasi = jadwalDAO.getTanggalById(r.getIdJadwal());
-        int jumlahOrang = new ReservasiMejaDAO(DBConnection.getConnection())
-                .getTotalKapasitasMejaByReservasiId(idReservasi);
-
-        System.out.println("\n-------------------------------------------");
-        System.out.println("              DATA RESERVASI");
-        System.out.println("-------------------------------------------");
-        System.out.println("ID Reservasi   : " + idReservasi);
-        System.out.println("Nama Pelanggan : " + pelanggan.getNama());
-        System.out.println("Jumlah Orang   : " + jumlahOrang);
-        System.out.println("Tanggal        : " + tanggalReservasi);
-        System.out.println("-------------------------------------------\n");
 
         if (pembayaranDAO.getByReservasi(idReservasi) != null) {
             System.out.println("Reservasi ini sudah dibayar.");
@@ -433,7 +335,7 @@ public class KasirMenu {
         double kembalian = bayar - total;
 
         // Ambil tanggal dan jam selesai dari jadwal
-        
+        JadwalReservasiDAO jadwalDAO = new JadwalReservasiDAO(DBConnection.getConnection());
         LocalDate tanggalDatang = jadwalDAO.getTanggalById(r.getIdJadwal());
         LocalTime jamSelesai = jadwalDAO.getJamSelesaiById(r.getIdJadwal());
 
